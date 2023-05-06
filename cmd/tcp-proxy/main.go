@@ -7,6 +7,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	proxy "github.com/jpillora/go-tcp-proxy"
 )
@@ -86,7 +87,7 @@ func main() {
 		p.Log = proxy.ColorLogger{
 			Verbose:     *verbose,
 			VeryVerbose: *veryverbose,
-			Prefix:      fmt.Sprintf("Connection #%03d ", connid),
+			Prefix:      fmt.Sprintf("%v : Connection #%03d ", time.Now().Format("2006-01-02 15:04:05"), connid),
 			Color:       *colors,
 		}
 
