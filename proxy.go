@@ -10,6 +10,7 @@ import (
 type Proxy struct {
 	sentBytes     uint64
 	receivedBytes uint64
+	caddr         string
 	laddr, raddr  *net.TCPAddr
 	lconn, rconn  io.ReadWriteCloser
 	erred         bool
@@ -29,7 +30,9 @@ type Proxy struct {
 // New - Create a new Proxy instance. Takes over local connection passed in,
 // and closes it when finished.
 func New(lconn *net.TCPConn, laddr, raddr *net.TCPAddr) *Proxy {
+	caddr := lconn.RemoteAddr().String()
 	return &Proxy{
+		caddr:  caddr,
 		lconn:  lconn,
 		laddr:  laddr,
 		raddr:  raddr,
@@ -46,6 +49,8 @@ func NewTLSUnwrapped(lconn *net.TCPConn, laddr, raddr *net.TCPAddr, addr string)
 	p := New(lconn, laddr, raddr)
 	p.tlsUnwrapp = true
 	p.tlsAddress = addr
+
+	//log.Printf("Connect from %s >>> %s", fromAddr, p.laddr.String())
 	return p
 }
 
@@ -81,6 +86,7 @@ func (p *Proxy) Start() {
 	}
 
 	//display both ends
+	p.Log.Info("Connect from %s", p.caddr)
 	p.Log.Info("Opened %s >>> %s", p.laddr.String(), p.raddr.String())
 
 	//bidirectional copy
